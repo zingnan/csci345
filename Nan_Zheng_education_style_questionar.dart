@@ -13,8 +13,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum Gender { male, female, other,lgbtq,nonBinary, preferNotToSay, }
-
 class MyForm extends StatefulWidget {
   @override
   _MyFormState createState() => _MyFormState();
@@ -23,12 +21,12 @@ class MyForm extends StatefulWidget {
 class _MyFormState extends State<MyForm> {
   String? whereFrom;
   String numberOfChildren = "";
-  String? childAge;
-  Gender gender = Gender.male;
-  Gender childGender = Gender.male;
+  double childAge = 1.0;
+  String? selectedGender;
+  String? childGender;
   String educationStyle = "";
 
-  List<String> states = [//this part debug by ChatGPT
+  List<String> states = [
     "Alabama",
     "Alaska",
     "Arizona",
@@ -79,21 +77,15 @@ class _MyFormState extends State<MyForm> {
     "West Virginia",
     "Wisconsin",
     "Wyoming",
+  ];
 
-  ];/* END of ChatGPT-debug part. */
-
-  List<String> ages = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "older than 10",
+  List<String> genderOptions = [
+    "Male",
+    "Female",
+    "Other",
+    "LGBTQ+",
+    "NonBinary",
+    "PreferNotToSay",
   ];
 
   @override
@@ -107,6 +99,13 @@ class _MyFormState extends State<MyForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            /*DropdownMenuItem function based on
+            *https://www.jianshu.com/p/16fcbece02e4,
+            *https://github.com/ACE-YANGCE/FlutterApp/blob/master/lib/page/drop_down_page.dart,
+            *https://stackoverflow.com/questions/69603930/how-to-get-dropdownmenuitem-from-a-list,
+            *https://stackoverflow.com/questions/59509240/how-to-display-a-listdropdownitemstring-when-using-a-list-generate-method,
+            */
+
             Text('Which state are you from?'),
             DropdownButton<String>(
               value: whereFrom,
@@ -131,71 +130,57 @@ class _MyFormState extends State<MyForm> {
                 });
               },
             ),
+
+
+            /*slider function based on https://github.com/Burd-Courses/Flutter2023/blob/main/slider2.dart
+            * based on age change the birth year */
+
             Text('How old are your children?'),
-            DropdownButton<String>(
+            Slider(
               value: childAge,
-              onChanged: (String? value) {
+              min: 1.0,
+              max: 30.0,
+              divisions: 29,
+              onChanged: (value) {
                 setState(() {
                   childAge = value;
                 });
               },
-              items: ages.map<DropdownMenuItem<String>>((String age) {
-                return DropdownMenuItem<String>(
-                  value: age,
-                  child: Text(age),
-                );
-              }).toList(),
+              label: '${childAge.toInt()},'
             ),
+
             Text('What’s your gender?'),
-            DropdownButton<Gender>(
-              value: gender,
-              onChanged: (Gender? value) {
+            DropdownButton<String>(
+              value: selectedGender,
+              onChanged: (String? value) {
                 setState(() {
-                  gender = value!;
+                  selectedGender = value;
                 });
               },
-              items: Gender.values.map<DropdownMenuItem<Gender>>((Gender gender) {
-                return DropdownMenuItem<Gender>(
+              items: genderOptions.map<DropdownMenuItem<String>>((String gender) {
+                return DropdownMenuItem<String>(
                   value: gender,
-                  child: Text(genderToString(gender)),
+                  child: Text(gender),
                 );
               }).toList(),
             ),
+
             Text('What’s your children’s gender?'),
-            Row(
-              children: <Widget>[
-                Radio(
-                  value: Gender.male,
-                  groupValue: childGender,
-                  onChanged: (Gender? value) {
-                    setState(() {
-                      childGender = value!;
-                    });
-                  },
-                ),
-                Text('Male'),
-                Radio(
-                  value: Gender.female,
-                  groupValue: childGender,
-                  onChanged: (Gender? value) {
-                    setState(() {
-                      childGender = value!;
-                    });
-                  },
-                ),
-                Text('Female'),
-                Radio(
-                  value: Gender.other,
-                  groupValue: childGender,
-                  onChanged: (Gender? value) {
-                    setState(() {
-                      childGender = value!;
-                    });
-                  },
-                ),
-                Text('Prefer not to say'),
-              ],
+            DropdownButton<String>(
+              value: childGender,
+              onChanged: (String? value) {
+                setState(() {
+                  childGender = value;
+                });
+              },
+              items: genderOptions.map<DropdownMenuItem<String>>((String gender) {
+                return DropdownMenuItem<String>(
+                  value: gender,
+                  child: Text(gender),
+                );
+              }).toList(),
             ),
+
             Text('What is your style for education?'),
             TextField(
               onChanged: (value) {
@@ -204,38 +189,26 @@ class _MyFormState extends State<MyForm> {
                 });
               },
             ),
+
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
                 print('Which state are you from? $whereFrom');
                 print('How many children do you have? $numberOfChildren');
                 print('How old are your children? $childAge');
-                print('What’s your gender? ${genderToString(gender)}');
-                print('What’s your children’s gender? ${genderToString(childGender)}');
+                print('What’s your gender? $selectedGender');
+                print('What’s your children’s gender? $childGender');
                 print('What is your style for education? $educationStyle');
               },
               child: Text('Submit'),
+
+
+              /*
+              * respond page to be added*/
             ),
           ],
         ),
       ),
     );
-  }
-
-  String genderToString(Gender gender) {
-    switch (gender) {
-      case Gender.male:
-        return 'Male';
-      case Gender.female:
-        return 'Female';
-      case Gender.other:
-        return 'Other';
-      case Gender.lgbtq:
-        return 'LGBTQ+';
-      case Gender.nonBinary:
-        return 'Non-binary';
-      case Gender.preferNotToSay:
-        return 'Prefer not to say';
-    }
   }
 }
